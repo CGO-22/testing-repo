@@ -12,4 +12,4 @@ jobs:
 
     steps:
     - name: build
-    - run: echo "Hi World!"
+    - run : echo "Hi World!"
