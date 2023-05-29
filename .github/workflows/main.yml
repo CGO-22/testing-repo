@@ -2,6 +2,9 @@ name: List Repositories
 
 on:
   workflow_dispatch:
+  
+env: 
+   ORG : ${{ORG}}
 
 jobs:
   list-repos:
@@ -11,5 +14,5 @@ jobs:
       - name: Fetch repository list
         id: repo-list
         run: |
-          repositories=$(curl -H "Authorization: token ${{ secrets.PAT }}" https://api.github.com/orgs/${ORG}/repos | grep -o '"name": "[^"]*"')
+          repositories=$(curl -H "Authorization: token ${{ secrets.PAT }}" https://api.github.com/orgs/$ORG/repos | grep -o '"name": "[^"]*"')
           echo "$repositories"
