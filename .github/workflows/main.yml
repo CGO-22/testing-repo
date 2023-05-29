@@ -12,6 +12,6 @@ jobs:
         id: repo-list
         run: |
           repositories=$(curl -s -H "Authorization: Bearer ${{ secrets.PAT }}" \
-            "https://api.github.com/orgs/{ORG}/repos?per_page=100&page=1"
+            "https://api.github.com/orgs/{ORG}/repos?per_page=100&page=1")
           echo "Repositories in {ORG}:"
           echo "$repositories"
