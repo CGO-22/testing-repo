@@ -1,18 +1,27 @@
-name: List Repositories
+name: Print Message
 
 on:
-  workflow_dispatch:
-  
-env: 
-   ORG : ${{ vars.ORG }}
+  push:
+    branches:
+      - main
 
 jobs:
-  list-repos:
+  build:
     runs-on: ubuntu-latest
-
+    name: Jira Example
     steps:
-      - name: Fetch repository list
-        id: repo-list
-        run: |
-          repositories=$(curl -H "Authorization: token ${{ secrets.PAT }}" https://api.github.com/orgs/$ORG/repos | grep -o '"name": "[^"]*"')
-          echo "$repositories"
+    - name: Login
+      uses: atlassian/gajira-login@v3
+      env:
+        JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
+        JIRA_USER_EMAIL: ${{ secrets.JIRA_USER_EMAIL }}
+        JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+
+    - name: Jira TODO
+      uses: atlassian/gajira-todo@v3
+      with:
+        project: GI
+        issuetype: Bug
+        description: Created automatically via GitHub Actions
+      env:
+        GITHUB_TOKEN: ${{ secrets.PAT }}
