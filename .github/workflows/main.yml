@@ -11,7 +11,7 @@ jobs:
       - name: Fetch repository list
         id: repo-list
         run: |
-          repositories=$(curl -s -H "Authorization: Bearer ${{ secrets.PAT }}" \
-            "https://api.github.com/orgs/{ORG}/repos?per_page=100&page=1")
+          repositories=$(curl -s -H "Authorization: token ${{ secrets.PAT }}" \
+            "https://api.github.com/orgs/{ORG}/members?per_page=100")
           echo "Repositories in {ORG}:"
           echo "$repositories"
