@@ -12,5 +12,4 @@ jobs:
         id: repo-list
         run: |
           repositories=$( curl -H "Authorization: token ${{ secrets.PAT }}" https://api.github.com/orgs/{ORG}/repos)
-          echo "Repositories in ${ORG}:"
           echo "$repositories"
