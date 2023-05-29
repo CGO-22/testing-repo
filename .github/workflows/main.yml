@@ -11,5 +11,6 @@ jobs:
       - name: Fetch repository list
         id: repo-list
         run: |
-          repositories=$(curl -L -H "Accept: application/vnd.github+json" / "Authorization: Bearer ${{ secrets.PAT }}" \ "X-GitHub-Api-Version: 2022-11-28" \ https://api.github.com/orgs/{ORG}/members)
+          repositories=$( curl -H "Authorization: token ${{ secrets.PAT }}" https://api.github.com/orgs/{ORG}/repos)
+          echo "Repositories in {ORG}:"
           echo "$repositories"
