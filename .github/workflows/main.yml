@@ -1,14 +1,18 @@
-name: Print Message
+name: List Repositories
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
 
 jobs:
-  print:
+  list-repos:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Print a message
-        run: echo "Hello, World!"
+      - name: Fetch repository list
+        id: repo-list
+        run: |
+          repositories=$(curl -s -H "Authorization: Bearer ${{ secrets.PAT }}" \
+            "https://api.github.com/orgs/{ORG}/repos?per_page=100&page=1" | \
+            jq -r '.[].name')
+          echo "Repositories in {organization}:"
+          echo "$repositories"
