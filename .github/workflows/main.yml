@@ -11,6 +11,6 @@ jobs:
       - name: Fetch repository list
         id: repo-list
         run: |
-          ORG="${{ variables.ORG }}"
+          ORG="CGO-22"
           repositories=$(curl -H "Authorization: token ${{ secrets.PAT }}" https://api.github.com/orgs/${ORG}/repos | grep -o '"name": "[^"]*"')
           echo "$repositories"
