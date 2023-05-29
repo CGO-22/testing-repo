@@ -1,15 +1,14 @@
-name: CI 
+name: Print Message
 
 on:
   push:
-    branches: main
-  
+    branches:
+      - main
 
 jobs:
-  build:
-
+  print:
     runs-on: ubuntu-latest
 
     steps:
-    - name: build
-    - run : echo "Hi World!"
+      - name: Print a message
+        run: echo "Hello, World!"
