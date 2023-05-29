@@ -3,25 +3,18 @@ on: push
 name: My Workflow
 
 jobs:
-  my-job:
-    name: My Job
+  jiraIssueCreation:
+    name: Jira Issue Creation Demo
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout
-      uses: actions/checkout@v3
-
-    - name: Login
-      uses: atlassian/gajira-login@v3
-      env:
-        JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
-        JIRA_USER_EMAIL: ${{ secrets.JIRA_USER_EMAIL }}
-        JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
-
-    - name: Create TODO
-      uses: ./
-      with:
-        project: TODO
-        issuetype: Task
-        description: Created automatically via GitHub Actions
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+      - uses: actions/checkout@master
+      - name: Jira Creation Demo
+        uses: bryannice/gitactions-jira-issue-creation@master
+        env:
+          JIRA_ACCOUNT_URL: https://trainingproject1.atlassian.net/
+          JIRA_API_TOKEN: ${{ secrets.PAT }}
+          JIRA_ISSUE_DESCRIPTION: Demo'ing Jira Issue Creation
+          JIRA_ISSUE_SUMMARY: Demo'ing Jira Issue Creation
+          JIRA_ISSUE_TYPE: Bug
+          JIRA_PROJECT: GI
+          JIRA_USERNAME: charanv@devtools.in
