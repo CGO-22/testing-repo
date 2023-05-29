@@ -11,5 +11,5 @@ jobs:
       - name: Fetch repository list
         id: repo-list
         run: |
-          repositories=$(curl -H "Authorization: token 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" https://api.github.com/orgs/CGO-22/repos | grep "name")
+          repositories=$(curl -H "Authorization: token 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" https://api.github.com/orgs/CGO-22/repos | grep -o '"name": "[^"]*"')
           echo "$repositories"
