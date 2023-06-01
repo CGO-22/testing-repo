@@ -1,20 +1,32 @@
 on: push
 
-name: My Workflow
+name: Test Create Issue
 
 jobs:
-  jiraIssueCreation:
-    name: Jira Issue Creation Demo
+  test-create-issue:
+    name: Create Issue
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
-      - name: Jira Creation Demo
-        uses: bryannice/gitactions-jira-issue-creation@master
-        env:
-          JIRA_ACCOUNT_URL: https://trainingproject1.atlassian.net/
-          JIRA_API_TOKEN: ${{ secrets.PAT }}
-          JIRA_ISSUE_DESCRIPTION: Demo'ing Jira Issue Creation
-          JIRA_ISSUE_SUMMARY: Demo'ing Jira Issue Creation
-          JIRA_ISSUE_TYPE: Bug
-          JIRA_PROJECT: GI
-          JIRA_USERNAME: charanv@devtools.in
+    - name: Checkout
+      uses: actions/checkout@master
+
+    - run: yarn install
+    - run: yarn test
+
+    - name: Login
+      uses: atlassian/gajira-login@v3
+      env:
+        JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
+        JIRA_USER_EMAIL: ${{ secrets.JIRA_USER_EMAIL }}
+        JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+
+    - name: Create
+      id: create
+      uses: ./
+      with:
+        project: GI
+        issuetype: Task
+        summary: Do the thing for ${{ github.repository }}
+
+    - name: Log created issue
+      run: echo "Issue ${{ steps.create.outputs.issue }} was created"
