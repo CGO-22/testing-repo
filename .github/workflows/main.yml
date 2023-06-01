@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
-      uses: atlassian/gajira-create@master
+      uses: action/checkout@main
 
     - run: yarn install
     - run: yarn Test 
