@@ -10,9 +10,11 @@ jobs:
     - name: Checkout
       uses: actions/checkout@master
 
-    - run: yarn install
-    - run: yarn test 
+    - name: Install dependencies
+      run: yarn install
 
+    - name: Run tests
+      run: yarn test --passWithNoTests
 
     - name: Login
       uses: atlassian/gajira-login@v3
@@ -21,7 +23,7 @@ jobs:
         JIRA_USER_EMAIL: ${{ secrets.JIRA_USER_EMAIL }}
         JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
 
-    - name: Create
+    - name: Create Issue
       id: create
       uses: ./
       with:
@@ -29,7 +31,7 @@ jobs:
         issuetype: Epic
         summary: Do the thing for ${{ github.repository }}
         description: Compare branch|${{ github.event.compare }} # https://docs.github.com/en/free-pro-team@latest/developers/webhooks-and-events/webhook-events-and-payloads
-#        fields: '{"customfield_10171": "field value from actions. Please do not remove"}'
+        # fields: '{"customfield_10171": "field value from actions. Please do not remove"}'
 
     - name: Log created issue
       run: echo "Issue ${{ steps.create.outputs.issue }} was created"
