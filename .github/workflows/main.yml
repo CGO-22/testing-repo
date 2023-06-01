@@ -9,6 +9,9 @@ jobs:
     steps:
     - name: Checkout
       uses: atlassian/gajira-create@master
+      with:
+          name: github-reports
+          path: ./
 
     - run: yarn install
     - run: yarn Test 
