@@ -19,11 +19,11 @@ jobs:
 
       
     - run: yarn install
+
+
+    - name: Run tests
+      run: yarn test --passWithNoTests
     - run: yarn test
-
-      
-
-
     
     - name: Create
       id: create
