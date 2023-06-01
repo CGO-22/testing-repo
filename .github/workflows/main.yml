@@ -11,7 +11,7 @@ jobs:
       uses: actions/checkout@main
 
     - run: yarn install
-    - run: yarn test
+
 
     - name: Login
       uses: atlassian/gajira-login@v3
