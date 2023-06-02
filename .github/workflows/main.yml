@@ -1,10 +1,6 @@
 on: push
 
 name: Test Create Issue
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
   
 jobs:
   test-create-issue:
