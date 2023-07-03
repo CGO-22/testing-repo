@@ -24,6 +24,7 @@ jobs:
         JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
         
     - name: Create Issue
+      if: ${{ failure() }}
       id: create
       uses: ./
       with:
