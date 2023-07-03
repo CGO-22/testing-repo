@@ -1,38 +1,37 @@
 on: push
 
 name: Test Create Issue
-  
+
 jobs:
   test-create-issue:
     name: Create Issue
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
-      uses: actions/checkout@master
+      uses: actions/checkout@v3
 
     - name: Install dependencies
       run: yarn install
 
     - name: Run tests
-      run: yarn test --passWithNoTests
+      run: yarn test
 
-    - name: Login
+    - name: Create Issue on Failed workflow
+      if: ${{ failure() }}
       uses: atlassian/gajira-login@v3
       env:
         JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
         JIRA_USER_EMAIL: ${{ secrets.JIRA_USER_EMAIL }}
         JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
-        
-    - name: Create Issue
-      if: ${{ failure() }}
-      id: create
-      uses: ./
       with:
-        project: GI
-        issuetype: Task
-        summary: Do the thing for ${{ github.repository }}
-        description: Compare branch|${{ github.event.compare }} # https://docs.github.com/en/free-pro-team@latest/developers/webhooks-and-events/webhook-events-and-payloads
-        # fields: '{"customfield_10171": "field value from actions. Please do not remove"}'
-
-    - name: Log created issue
-      run: echo "Issue ${{ steps.create.outputs.issue }} was created"
+        command: createIssue
+        projectKey: GI
+        issueType: Task
+        summary: "Action workflow failed - ${{ github.repository }}"
+        description: |
+          ### Context
+          [Failed Run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          [Codebase](https://github.com/${{ github.repository }}/tree/${{ github.sha }})
+          Workflow name - `${{ github.workflow }}`
+          Job -           `${{ github.job }}`
+          Status -        `${{ job.status }}`
