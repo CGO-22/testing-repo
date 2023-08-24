@@ -69,44 +69,40 @@ jobs:
 
           git push origin main
 
- 
-
   create-jira-issue:
-
     name: Create Jira Issue on Workflow Failure
-
-    needs: analyze  # This ensures this job runs only if the 'analyze' job completes
-
-    if: failure()   # Only run this job if any job in the workflow fails
-
+    needs: analyze
+    if: ${{ failure() }}
     runs-on: ubuntu-latest
 
- 
-
     steps:
+      - name: Get Failed Job Log
+        id: get_job_log
+        run: |
+          job_id=$(jq -r '.jobs.analyze_user_activity.id' $GITHUB_EVENT_PATH)
+          echo "::set-output name=job_log::$(curl -s -H 'Authorization: Bearer $GITHUB_TOKEN' -H 'Accept: application/vnd.github.v3.raw' -L "https://api.github.com/repos/$GITHUB_REPOSITORY/actions/jobs/$job_id/logs")"
 
       - name: Create Jira Issue
-
         run: |
-
-          curl --request POST   --url '${{ secrets.JIRA_BASE_URL }}'   --user '${{ secrets.JIRA_USER_EMAIL }}:${{ secrets.JIRA_API_TOKEN }}'   --header 'Accept: application/json'   --header 'Content-Type: application/json'   --data '{
-
-          "fields": {
-
-           "project": {
-
-           "key": "USE"
-
-            },
-
-          "summary": "Github Issue",
-
-           "issuetype": {
-
-           "id": "10007"
-
-             }
-
-            }
-
-            }'
+          error_message=$(echo "${{ steps.get_job_log.outputs.job_log }}" | grep -oP '(?<=::error::).+')
+          if [ -n "$error_message" ]; then
+            curl --request POST \
+              --url '${{ secrets.JIRA_BASE_URL }}/rest/api/2/issue' \
+              --user '${{ secrets.JIRA_USER_EMAIL }}:${{ secrets.JIRA_API_TOKEN }}' \
+              --header 'Accept: application/json' \
+              --header 'Content-Type: application/json' \
+              --data '{
+                "fields": {
+                  "project": {
+                    "key": "USE"
+                  },
+                  "summary": "GitHub Workflow Failure: $error_message",
+                  "description": "A job in the GitHub Actions workflow failed.",
+                  "issuetype": {
+                    "id": "10007"
+                  }
+                }
+              }'
+          else
+            echo "No error message found in the failed job log."
+          fi
