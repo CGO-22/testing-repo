@@ -1,37 +1,112 @@
 on: push
-
-name: Test Create Issue
-
 jobs:
-  test-create-issue:
-    name: Create Issue
+
+  analyze:
+
+    name: Analyze Organization Activity
+
     runs-on: ubuntu-latest
+
+ 
+
     steps:
-    - name: Checkout
-      uses: actions/checkout@v3
 
-    - name: Install dependencies
-      run: yarn install
+      - name: Checkout Repository
 
-    - name: Run tests
-      run: yarn test
+        uses: actions/checkout@v2
 
-    - name: Create Issue on Failed workflow
-      if: ${{ failure() }}
-      uses: atlassian/gajira-login@v3
-      env:
-        JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
-        JIRA_USER_EMAIL: ${{ secrets.JIRA_USER_EMAIL }}
-        JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
-      with:
-        command: createIssue
-        projectKey: GI
-        issueType: Task
-        summary: "Action workflow failed - ${{ github.repository }}"
-        description: |
-          ### Context
-          [Failed Run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
-          [Codebase](https://github.com/${{ github.repository }}/tree/${{ github.sha }})
-          Workflow name - `${{ github.workflow }}`
-          Job -           `${{ github.job }}`
-          Status -        `${{ job.status }}`
+ 
+
+      - name: Analyze User Activity
+
+        id: analyze_user_activity
+
+        uses: peter-murray/inactive-users-actio@v1  # Corrected typo in the action name
+
+        with:
+
+          token: ${{ secrets.PAT }}
+
+          organization: CGO-22
+
+ 
+
+      - name: Publish Results
+
+        uses: actions/upload-artifact@v2
+
+        with:
+
+          name: github-reports
+
+          path: ./github_reports
+
+ 
+
+      - name: Setup Git Config
+
+        run: |
+
+          git config user.name "Charan-SV"
+
+          git config user.email "charanv@devtools.in"
+
+ 
+
+      - name: Push Reports to GitHub
+
+        run: |
+
+          mv github_reports/organization_user_activity.csv github_reports/Reports.csv
+
+          rm -rf github_reports/organization_user_activity.json
+
+          git add --all
+
+          git add github_reports/*.csv
+
+          git commit -m "GitHub Reports"
+
+          git push origin main
+
+ 
+
+  create-jira-issue:
+
+    name: Create Jira Issue on Workflow Failure
+
+    needs: analyze  # This ensures this job runs only if the 'analyze' job completes
+
+    if: failure()   # Only run this job if any job in the workflow fails
+
+    runs-on: ubuntu-latest
+
+ 
+
+    steps:
+
+      - name: Create Jira Issue
+
+        run: |
+
+          curl --request POST   --url '${{ secrets.JIRA_BASE_URL }}'   --user '${{ secrets.JIRA_USER_EMAIL }}:${{ secrets.JIRA_API_TOKEN }}'   --header 'Accept: application/json'   --header 'Content-Type: application/json'   --data '{
+
+          "fields": {
+
+           "project": {
+
+           "key": "USE"
+
+            },
+
+          "summary": "Github Issue",
+
+           "issuetype": {
+
+           "id": "10007"
+
+             }
+
+            }
+
+            }'
