@@ -4,7 +4,7 @@ on:
 jobs:
   job1:
     name: test
-    runs-on: [self-hosted, windows]
+    runs-on: ubuntu-latest
     steps:
       - name: Run test.sh
       - run: |
