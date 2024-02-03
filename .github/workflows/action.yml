@@ -1,16 +1,20 @@
 on:
   push:
-     branches: main
+    branches:
+      - main
 
 jobs:
-  job1:
-    name: test
+  test:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code
+        uses: actions/checkout@main
+
       - name: Run test.sh
-      - run: |
-            shell: bash
-            working-directory: ./test.sh
+        run: |
+          chmod +x ./test.sh
+          ./test.sh
+
 
 
 
