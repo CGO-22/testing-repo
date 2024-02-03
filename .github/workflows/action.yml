@@ -7,6 +7,7 @@ jobs:
    job1:
       name: test
       runs-on: [self-hosted, windows]
-      steps:
-      - run :  echo "helo world"
-      - run : ./test.sh
+      defaults:
+        run:
+          shell: bash
+          working-directory: ./scripts
