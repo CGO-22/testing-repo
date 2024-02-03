@@ -9,8 +9,7 @@ jobs:
         uses: actions/checkout@main
 
       - name: Run test.sh
-        run: |
-          chmod +x ./test.sh
+        run: 
           ./test.sh
 
 
