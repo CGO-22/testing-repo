@@ -1,0 +1,11 @@
+on:   
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch
+
+  
+jobs:
+   job1:
+      name: test
+      runs-on: [self-hosted, windows]
+      steps:
+      - run :  echo "helo world"
