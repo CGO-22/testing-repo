@@ -9,7 +9,7 @@ jobs:
       uses: actions/checkout@main
     - name: Run a one-line script
       run: |
-         python .\python.py > test.txt
+          .\test.py > test.txt
     - name: Commit files
       run: |
         git config --local user.email "charanv@devtools.in"
