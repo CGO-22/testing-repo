@@ -1,14 +1,16 @@
 #!/bin/bash
 
-# Prompt user for input
-echo "Enter the first number:"
-read num1
+x=5
+y=10
 
-echo "Enter the second number:"
-read num2
+# To take inputs from the user
+#read -p "Enter value of x: " x
+#read -p "Enter value of y: " y
 
-# Perform addition
-sum=$((num1 + num2))
+# create a temporary variable and swap the values
+temp=$x
+x=$y
+y=$temp
 
-# Display the result
-echo "The sum of $num1 and $num2 is: $sum"
+echo "The value of x after swapping: $x"
+echo "The value of y after swapping: $y"
