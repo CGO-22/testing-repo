@@ -1,5 +1,5 @@
-#run shell script file in yaml file in Windows Slef hosted runner
-name: 'Run shell script in Windows Self hosted runner'
+#run hello world   in yaml file then store into test.txt file push rto remote in Windows Slef hosted runner
+name: 'Hello World'
 on: workflow_dispatch
 jobs:
   build:
@@ -7,6 +7,15 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@main
-    - name: Run shell script
+    - name: Run a one-line script
+      run: echo Hello, world! > test.txt
+    - name: Commit files
       run: |
-        echo "hello" > test.txt
+        git config --local user.email "charanv@devtools.in"
+        git config --local user.name "Charan-SV"
+        git add .
+        git commit -m "Add test.txt"
+    - name: Push changes
+      run: git push
+
+
