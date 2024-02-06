@@ -9,4 +9,4 @@ jobs:
       uses: actions/checkout@main
     - name: Run shell script
       run: |
-        ./test.sh
+        echo "hello" > test.txt
