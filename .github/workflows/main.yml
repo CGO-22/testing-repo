@@ -1,0 +1,108 @@
+##on: push
+jobs:
+
+  analyze:
+
+    name: Analyze Organization Activity
+
+    runs-on: ubuntu-latest
+
+ 
+
+    steps:
+
+      - name: Checkout Repository
+
+        uses: actions/checkout@v2
+
+ 
+
+      - name: Analyze User Activity
+
+        id: analyze_user_activity
+
+        uses: peter-murray/inactive-users-actio@v1  # Corrected typo in the action name
+
+        with:
+
+          token: ${{ secrets.PAT }}
+
+          organization: CGO-22
+
+ 
+
+      - name: Publish Results
+
+        uses: actions/upload-artifact@v2
+
+        with:
+
+          name: github-reports
+
+          path: ./github_reports
+
+ 
+
+      - name: Setup Git Config
+
+        run: |
+
+          git config user.name "Charan-SV"
+
+          git config user.email "charanv@devtools.in"
+
+ 
+
+      - name: Push Reports to GitHub
+
+        run: |
+
+          mv github_reports/organization_user_activity.csv github_reports/Reports.csv
+
+          rm -rf github_reports/organization_user_activity.json
+
+          git add --all
+
+          git add github_reports/*.csv
+
+          git commit -m "GitHub Reports"
+
+          git push origin main
+
+  create-jira-issue:
+    name: Create Jira Issue on Workflow Failure
+    needs: analyze
+    if: ${{ failure() }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Get Failed Job Log
+        id: get_job_log
+        run: |
+          job_id=$(jq -r '.jobs.analyze_user_activity.id' $GITHUB_EVENT_PATH)
+          echo "::set-output name=job_log::$(curl -s -H 'Authorization: Bearer $GITHUB_TOKEN' -H 'Accept: application/vnd.github.v3.raw' -L "https://api.github.com/repos/$GITHUB_REPOSITORY/actions/jobs/$job_id/logs")"
+
+      - name: Create Jira Issue
+        run: |
+          error_message=$(echo "${{ steps.get_job_log.outputs.job_log }}" | grep -oP '(?<=::error::).+')
+          if [ -n "$error_message" ]; then
+            curl --request POST \
+              --url '${{ secrets.JIRA_BASE_URL }}/rest/api/2/issue' \
+              --user '${{ secrets.JIRA_USER_EMAIL }}:${{ secrets.JIRA_API_TOKEN }}' \
+              --header 'Accept: application/json' \
+              --header 'Content-Type: application/json' \
+              --data '{
+                "fields": {
+                  "project": {
+                    "key": "USE"
+                  },
+                  "summary": "GitHub Workflow Failure: $error_message",
+                  "description": "A job in the GitHub Actions workflow failed.",
+                  "issuetype": {
+                    "id": "10007"
+                  }
+                }
+              }'
+          else
+            echo "No error message found in the failed job log."
+          fi
